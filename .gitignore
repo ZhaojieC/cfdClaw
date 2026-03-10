@@ -1,0 +1,31 @@
+# Build artifacts
+/build/
+/bin/
+/obj/
+/out/
+*.o
+*.a
+*.so
+*.dylib
+*.exe
+*.out
+
+# Fortran
+*.mod
+*.smod
+*.gfortran
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Logs
+*.log
+
+# Editors
+*.swp
+*.swo
+*.bak
+.DS_Store
