@@ -46,3 +46,40 @@ Use this as a compact reference for practical case edits. Ground truth for behav
 - `out` should show successful parameter read and advancing timesteps.
 - Common failure mode: restart/map file missing (e.g., `cyl_old.rst`, `cyl.map.rst`).
 - If running from a copied/new directory, use absolute path to `flexF` and copy required restart files.
+- `STASTEP` must be present in the parameter block, or runtime aborts with `forget to set STASTEP !`.
+
+## `.rea` structure rule (critical)
+
+When parameters are inserted/removed, line 4 (`N PARAMETERS FOLLOW`) must be updated.
+
+Count this exactly as:
+- number of lines after `PARAMETERS FOLLOW`
+- until `Lines of passive scalar data follows...`.
+
+Mismatch here can break parser behavior downstream.
+
+## 2D run convention in this workflow
+
+- Use `-z2` for 2D runs.
+- With `MODES=3` (2nd-order SEM), use dealiasing quadrature `LQUAD=5`, `MQUAD=5`.
+
+## `*.dog` format from `map.C`
+
+Current branch writes with `writedog2(...)`:
+
+- Default (`D_SCR` off, 13 columns):
+  1. `time`
+  2. `dx`
+  3. `dy`
+  4. `dzx`
+  5. `dzy`
+  6. `vx`
+  7. `vy`
+  8. `ax`
+  9. `ay`
+  10. `fx`
+  11. `fy`
+  12. `basep`
+  13. span index `i`
+
+- If `D_SCR` on (14 columns): inserts `old_static_map` after `dx`.

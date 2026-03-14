@@ -14,7 +14,8 @@ Use this skill for Zhicheng's in-house Nektar2.5D VIV work (not Nektar++ unless 
    - `cyl.rea`
    - mesh/restart files if restart mode is used (`cyl_old.rst`, `cyl.map.rst`)
 3. Edit VIV parameters in `cyl.rea`.
-4. Launch with `flexF` (normally `mpirun -np 1 .../SPM_Thermo/Linux/flexF -chk -z2 -S -ou cyl.rea`).
+4. Launch with `flexF` (for 2D runs in this workflow, **must** use `-z2`):
+   - `mpirun -np 1 .../SPM_Thermo/Linux/flexF -chk -z2 -S -ou cyl.rea`
 5. Tail `out` to verify progression and catch startup failures early.
 
 ## Build order (from project ReadMe)
@@ -26,6 +27,14 @@ Run `source compile` in this order:
 4. `Hlib/Linux/`
 5. `SPM_Thermo/Linux/`
 6. `Utilities/Linux/`
+
+### CCV-specific compile fallback
+
+If scratch-tarball build fails on CCV, copy known-good flags from the Codes tree:
+
+- `~/Codes/Nektar2.5D/Flags/Linux.inc` -> `<current>/Flags/Linux.inc`
+
+In practice, some tar copies may also need restoring missing/mismatched `include/` or Veclib files from `~/Codes/Nektar2.5D`.
 
 ## Running the standard 2D example
 
@@ -41,6 +50,15 @@ In `Example(s)/Cylinder/`:
 - For Re control in existing Cylinder cases, `KINVIS` is the primary fluid knob.
 - For structural settings, commonly edited parameters are `WN`, `WNC`, `WNB`, `ZMASS`, `ZETA`.
 - For prescribed harmonic motion, tune `AMPX/AMPY`, `FREQX/FREQY`, `PHITX/PHITY`.
+- `STASTEP` is required in this branch; missing it triggers runtime abort (`forget to set STASTEP !`).
+
+### Critical `.rea` integrity rule
+
+When adding/removing parameters, update line 4 (`N PARAMETERS FOLLOW`) to match the actual number of parameter lines.
+
+Count rule used in this workflow:
+- count lines **after** `PARAMETERS FOLLOW`
+- up to (but not including) `Lines of passive scalar data follows...`
 
 For parameter meaning details, read `references/map-rea-parameter-guide.md`.
 
@@ -52,6 +70,15 @@ For parameter meaning details, read `references/map-rea-parameter-guide.md`.
   - advancing `Time step = ...` lines
 - If startup fails with restart/map errors, ensure restart files are present in run directory.
 - If invoked outside original example directory, use absolute path for `flexF`.
+- For 2D runs, ignore the dealiasing warning text about `-z` multiples of 4 when `-z2` is intentionally used in this workflow.
+
+## Initial-condition conventions
+
+- Fresh run (no restart files): use `Given` with default zero fields (`u=v=w=0`, and `t=0` if thermal).
+- Restart run:
+  - rename `*.chk` -> `*_old.rst`
+  - rename `*.map` -> `*.map.rst`
+  - switch initial condition mode in `.rea` to `Restart`.
 
 ## Expected outputs
 
