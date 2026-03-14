@@ -55,6 +55,7 @@ This repo also ships an OpenClaw skill for the in-house **Nektar2.5D** VIV workf
   6. `Utilities/Linux/`
 - If scratch tarball build fails on CCV, fallback-copy:
   - `~/Codes/Nektar2.5D/Flags/Linux.inc` -> `<current>/Flags/Linux.inc`
+- `Flags/Linux.inc` is machine-dependent; on a different computer/cluster, compiler/toolchain settings may need to be changed before build works (`CC/CXX/FC`, MPI wrappers, flags, and lib paths).
 - For **2D simulation**, this workflow uses **`-z2`**.
 
 ### `.rea` file integrity rules (important)

@@ -36,6 +36,8 @@ If scratch-tarball build fails on CCV, copy known-good flags from the Codes tree
 
 In practice, some tar copies may also need restoring missing/mismatched `include/` or Veclib files from `~/Codes/Nektar2.5D`.
 
+> Portability note: `Flags/Linux.inc` is machine-dependent. On a different computer/cluster, compiler/toolchain lines in this file may need edits (e.g., `CC/CXX/FC`, MPI wrappers, compile/link flags, and library paths).
+
 ## Running the standard 2D example
 
 In `Example(s)/Cylinder/`:
