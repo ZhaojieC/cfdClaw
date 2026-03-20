@@ -114,3 +114,58 @@ out=${chk%.chk}.dat
 **Skill artifacts**
 - `skills/nektar2p5d-viv/`
 - `skills/nektar2p5d-viv.skill`
+
+## Galaexi on CCV (OpenClaw skill)
+This repo now includes an OpenClaw skill for compiling and running **Galaexi** on Brown CCV/Oscar.
+
+**What it covers**
+- NVHPC + HPCX module setup on CCV
+- Configure/build workflow (`cmake_nvhpc.sh` and MPI variant usage)
+- Preparing clean run folders from `Example/` inputs
+- Submitting GPU jobs with `sbatch runme.galaexi`
+- Quick runtime validation (`squeue`, `gpu.out`, `gpu.err`) and optional early stop after smoke-check
+
+**Skill artifacts**
+- `skills/galaexi-ccv/`
+- `skills/dist/galaexi-ccv.skill`
+
+## FLEXI 3D -> 2D(one-layer-z) restart interpolation note
+
+When generating an initial condition for a 2D-like case whose mesh is still 3D with one z-layer (e.g., `z=const`), use **`posti_swapmesh`** instead of copying/slicing `DG_Solution` directly.
+
+### Why
+- Source and target meshes are different.
+- Direct z-slice copy is not mesh-aware and can produce inconsistent fields.
+- `posti_swapmesh` performs proper mesh-to-mesh interpolation and projection.
+
+### Working setup used
+- Source restart: `~/Works/Compressible/Re5K_Ma2.0/restart.h5`
+- Target mesh/case: `~/Works/Compressible/Re5K_Ma2_2D/`
+- Parameter file: `swapmesh_ma2_3d_to_2d.ini`
+- Binary that worked: `~/Works/flexi_new/build_swapmesh/bin/posti_swapmesh`
+
+### Build `posti_swapmesh` (if needed)
+```bash
+cd ~/Works/flexi_new
+rm -rf build_swapmesh && mkdir build_swapmesh && cd build_swapmesh
+cmake .. \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DPOSTI=ON -DPOSTI_SWAPMESH=ON -DPOSTI_VISU=OFF \
+  -DLIBS_USE_MPI=OFF -DLIBS_BUILD_HDF5=ON \
+  -DFLEXI_FV=BLEND -DFLEXI_NODETYPE=GAUSS-LOBATTO
+cmake --build . --target posti_swapmesh -j 8
+```
+
+### Run interpolation
+```bash
+cd ~/Works/Compressible/Re5K_Ma2_2D
+~/Works/flexi_new/build_swapmesh/bin/posti_swapmesh \
+  swapmesh_ma2_3d_to_2d.ini \
+  ../Re5K_Ma2.0/restart.h5
+```
+
+### Known pitfall
+Older/incompatible `posti_swapmesh` binaries can fail with:
+- `Unknown option: FV_CellType`
+
+If that appears, switch to a compatible binary (as above) and rerun.
