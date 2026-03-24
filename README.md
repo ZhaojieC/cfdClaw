@@ -1,5 +1,7 @@
 # cfdClaw
 
+<img width="1600" height="1200" alt="1" src="https://github.com/user-attachments/assets/85bb905d-9b5f-49e3-b8a4-0a46fe93391a" />
+
 A project on using **OpenClaw** to assist learning and developing **CFD** skills.
 
 ## Focus Areas
